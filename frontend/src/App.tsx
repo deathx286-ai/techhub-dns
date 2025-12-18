@@ -4,6 +4,7 @@ import OrderDetailPage from "./pages/OrderDetailPage";
 import PreDeliveryQueue from "./pages/PreDeliveryQueue";
 import InDelivery from "./pages/InDelivery";
 import Admin from "./pages/Admin";
+import PdfSignPage from "./pages/PdfSignPage";
 import boxTAM from "../assets/boxTAM.svg";
 
 function App() {
@@ -50,6 +51,12 @@ function App() {
                 >
                   Admin
                 </Link>
+                <Link
+                  to="/pdf-sign"
+                  className="text-white font-medium hover:text-gray-200"
+                >
+                  PDF Sign
+                </Link>
               </nav>
             </div>
           </div>
@@ -63,6 +70,7 @@ function App() {
             <Route path="/pre-delivery" element={<PreDeliveryQueue />} />
             <Route path="/in-delivery" element={<InDelivery />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/pdf-sign" element={<PdfSignPage />} />
           </Routes>
         </main>
 
