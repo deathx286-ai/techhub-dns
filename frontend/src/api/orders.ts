@@ -1,49 +1,28 @@
-import apiClient from "./client";
-import { Order, OrderDetail, OrderStatus, OrderStatusUpdate, BulkStatusUpdate, AuditLog, TeamsNotification } from "../types/order";
+import { Order, OrderDetail, OrderStatus, OrderStatusUpdate, BulkStatusUpdate, AuditLog } from "../types/order";
+import { listOrders, getOrderDetail, updateStatus, bulkTransition, getAudit, retryTeams } from "../mock/store";
 
 export const ordersApi = {
-  getOrders: async (params?: {
-    status?: OrderStatus;
-    search?: string;
-    skip?: number;
-    limit?: number;
-  }) => {
-    const response = await apiClient.get<Order[]>("/orders", { params });
-    return response.data;
+  getOrders: async (params?: { status?: OrderStatus; search?: string }): Promise<Order[]> => {
+    return listOrders(params);
   },
 
-  getOrder: async (orderId: string) => {
-    const response = await apiClient.get<OrderDetail>(`/orders/${orderId}`);
-    return response.data;
+  getOrder: async (orderId: string): Promise<OrderDetail> => {
+    return getOrderDetail(orderId);
   },
 
-  updateOrderStatus: async (orderId: string, update: OrderStatusUpdate, changedBy?: string) => {
-    const response = await apiClient.patch<Order>(
-      `/orders/${orderId}/status`,
-      update,
-      { params: { changed_by: changedBy } }
-    );
-    return response.data;
+  updateOrderStatus: async (orderId: string, update: OrderStatusUpdate, changedBy?: string): Promise<Order> => {
+    return updateStatus(orderId, update.status, update.reason ?? changedBy);
   },
 
-  bulkUpdateStatus: async (update: BulkStatusUpdate, changedBy?: string) => {
-    const response = await apiClient.post<Order[]>(
-      "/orders/bulk-transition",
-      update,
-      { params: { changed_by: changedBy } }
-    );
-    return response.data;
+  bulkUpdateStatus: async (payload: BulkStatusUpdate): Promise<Order[]> => {
+    return bulkTransition(payload.order_ids, payload.status, payload.changed_by);
   },
 
-  getOrderAudit: async (orderId: string) => {
-    const response = await apiClient.get<AuditLog[]>(`/orders/${orderId}/audit`);
-    return response.data;
+  getOrderAudit: async (orderId: string): Promise<AuditLog[]> => {
+    return getAudit(orderId) as any;
   },
 
   retryNotification: async (orderId: string) => {
-    const response = await apiClient.post<{ success: boolean; notification_id: string }>(
-      `/orders/${orderId}/retry-notification`
-    );
-    return response.data;
+    return retryTeams(orderId);
   },
 };
